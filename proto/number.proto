@@ -4,9 +4,14 @@ package proto;
 
 service Number {
     rpc HelloNumber(InputNumber) returns (HelloOutput){};
+    rpc MultipleOfTwo(InputNumber) returns (stream OutputNumber){};
 }
 
 message InputNumber {
+    int64 num = 1;
+}
+
+message OutputNumber {
     int64 num = 1;
 }
 

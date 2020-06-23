@@ -16,6 +16,19 @@ func (n *numberServer) HelloNumber(ctx context.Context, in *pb.InputNumber) (*pb
 	}, nil
 }
 
+func (n *numberServer) MultipleOfTwo(in *pb.InputNumber, stream pb.Number_MultipleOfTwoServer) error {
+	for i := 1; i < 10000; i++ {
+		out := &pb.OutputNumber{
+			Num: in.Num * int64(i),
+		}
+
+		if err := stream.Send(out); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func main() {
 	listener, _ := net.Listen("tcp", ":50001")
 	grpcServer := grpc.NewServer()
