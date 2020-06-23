@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto;
+
+service Number {
+    rpc HelloNumber(InputNumber) returns (HelloOutput){};
+}
+
+message InputNumber {
+    int64 num = 1;
+}
+
+message HelloOutput {
+    string greeting = 1;
+}
