@@ -152,18 +152,20 @@ func init() {
 }
 
 var fileDescriptor_e6c6c2f2b9341206 = []byte{
-	// 164 bytes of a gzipped FileDescriptorProto
+	// 194 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xc9, 0x2b, 0xcd, 0x4d,
 	0x4a, 0x2d, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x53, 0x4a, 0xf2, 0x5c, 0xdc,
 	0x9e, 0x79, 0x05, 0xa5, 0x25, 0x7e, 0x60, 0x39, 0x21, 0x01, 0x2e, 0xe6, 0xbc, 0xd2, 0x5c, 0x09,
 	0x46, 0x05, 0x46, 0x0d, 0xe6, 0x20, 0x10, 0x53, 0x49, 0x81, 0x8b, 0xc7, 0xbf, 0xb4, 0x04, 0x9f,
 	0x0a, 0x4d, 0x2e, 0x6e, 0x8f, 0xd4, 0x9c, 0x9c, 0x7c, 0x88, 0x32, 0x21, 0x29, 0x2e, 0x8e, 0xf4,
-	0xa2, 0xd4, 0xd4, 0x92, 0xcc, 0xbc, 0x74, 0xb0, 0x2a, 0xce, 0x20, 0x38, 0xdf, 0xa8, 0x9e, 0x8b,
-	0x0d, 0x6a, 0x8c, 0x39, 0x54, 0x13, 0x94, 0x2b, 0x04, 0x71, 0x95, 0x1e, 0x92, 0x5b, 0xa4, 0x60,
-	0x62, 0x48, 0x86, 0x2b, 0x31, 0x08, 0xd9, 0x70, 0xf1, 0xfa, 0x96, 0xe6, 0x94, 0x64, 0x16, 0xe4,
-	0xa4, 0xfa, 0xa7, 0x85, 0x94, 0xe7, 0x63, 0xd5, 0x2a, 0x0c, 0x15, 0x43, 0x76, 0xb9, 0x12, 0x83,
-	0x01, 0x63, 0x12, 0x1b, 0x58, 0xdc, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0xb5, 0xa3, 0xff, 0x15,
-	0x0c, 0x01, 0x00, 0x00,
+	0xa2, 0xd4, 0xd4, 0x92, 0xcc, 0xbc, 0x74, 0xb0, 0x2a, 0xce, 0x20, 0x38, 0xdf, 0xe8, 0x27, 0x23,
+	0x17, 0x1b, 0xd4, 0x1c, 0x73, 0xa8, 0x2e, 0x28, 0x57, 0x08, 0xe2, 0x2c, 0x3d, 0x24, 0xc7, 0x48,
+	0xc1, 0xc4, 0x90, 0x4c, 0x57, 0x62, 0x10, 0xb2, 0xe1, 0xe2, 0xf5, 0x2d, 0xcd, 0x29, 0xc9, 0x2c,
+	0xc8, 0x49, 0xf5, 0x4f, 0x0b, 0x29, 0xcf, 0xc7, 0xaa, 0x55, 0x18, 0x2a, 0x86, 0xec, 0x74, 0x25,
+	0x06, 0x03, 0x46, 0x21, 0x6b, 0x2e, 0x9e, 0xe0, 0xd2, 0x5c, 0xff, 0x34, 0x88, 0x50, 0x31, 0x09,
+	0x9a, 0x35, 0x40, 0x9a, 0xb9, 0x20, 0x3c, 0xe7, 0x8c, 0xc4, 0x12, 0x92, 0xb4, 0x1a, 0x30, 0x26,
+	0xb1, 0x81, 0x65, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xb7, 0xaf, 0xed, 0x01, 0x87, 0x01,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -180,6 +182,8 @@ const _ = grpc.SupportPackageIsVersion6
 type NumberClient interface {
 	HelloNumber(ctx context.Context, in *InputNumber, opts ...grpc.CallOption) (*HelloOutput, error)
 	MultipleOfTwo(ctx context.Context, in *InputNumber, opts ...grpc.CallOption) (Number_MultipleOfTwoClient, error)
+	SumOfNumbers(ctx context.Context, opts ...grpc.CallOption) (Number_SumOfNumbersClient, error)
+	NumberChat(ctx context.Context, opts ...grpc.CallOption) (Number_NumberChatClient, error)
 }
 
 type numberClient struct {
@@ -231,10 +235,77 @@ func (x *numberMultipleOfTwoClient) Recv() (*OutputNumber, error) {
 	return m, nil
 }
 
+func (c *numberClient) SumOfNumbers(ctx context.Context, opts ...grpc.CallOption) (Number_SumOfNumbersClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Number_serviceDesc.Streams[1], "/proto.Number/SumOfNumbers", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &numberSumOfNumbersClient{stream}
+	return x, nil
+}
+
+type Number_SumOfNumbersClient interface {
+	Send(*InputNumber) error
+	CloseAndRecv() (*OutputNumber, error)
+	grpc.ClientStream
+}
+
+type numberSumOfNumbersClient struct {
+	grpc.ClientStream
+}
+
+func (x *numberSumOfNumbersClient) Send(m *InputNumber) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *numberSumOfNumbersClient) CloseAndRecv() (*OutputNumber, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(OutputNumber)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *numberClient) NumberChat(ctx context.Context, opts ...grpc.CallOption) (Number_NumberChatClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Number_serviceDesc.Streams[2], "/proto.Number/NumberChat", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &numberNumberChatClient{stream}
+	return x, nil
+}
+
+type Number_NumberChatClient interface {
+	Send(*InputNumber) error
+	Recv() (*OutputNumber, error)
+	grpc.ClientStream
+}
+
+type numberNumberChatClient struct {
+	grpc.ClientStream
+}
+
+func (x *numberNumberChatClient) Send(m *InputNumber) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *numberNumberChatClient) Recv() (*OutputNumber, error) {
+	m := new(OutputNumber)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // NumberServer is the server API for Number service.
 type NumberServer interface {
 	HelloNumber(context.Context, *InputNumber) (*HelloOutput, error)
 	MultipleOfTwo(*InputNumber, Number_MultipleOfTwoServer) error
+	SumOfNumbers(Number_SumOfNumbersServer) error
+	NumberChat(Number_NumberChatServer) error
 }
 
 // UnimplementedNumberServer can be embedded to have forward compatible implementations.
@@ -246,6 +317,12 @@ func (*UnimplementedNumberServer) HelloNumber(ctx context.Context, req *InputNum
 }
 func (*UnimplementedNumberServer) MultipleOfTwo(req *InputNumber, srv Number_MultipleOfTwoServer) error {
 	return status.Errorf(codes.Unimplemented, "method MultipleOfTwo not implemented")
+}
+func (*UnimplementedNumberServer) SumOfNumbers(srv Number_SumOfNumbersServer) error {
+	return status.Errorf(codes.Unimplemented, "method SumOfNumbers not implemented")
+}
+func (*UnimplementedNumberServer) NumberChat(srv Number_NumberChatServer) error {
+	return status.Errorf(codes.Unimplemented, "method NumberChat not implemented")
 }
 
 func RegisterNumberServer(s *grpc.Server, srv NumberServer) {
@@ -291,6 +368,58 @@ func (x *numberMultipleOfTwoServer) Send(m *OutputNumber) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Number_SumOfNumbers_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(NumberServer).SumOfNumbers(&numberSumOfNumbersServer{stream})
+}
+
+type Number_SumOfNumbersServer interface {
+	SendAndClose(*OutputNumber) error
+	Recv() (*InputNumber, error)
+	grpc.ServerStream
+}
+
+type numberSumOfNumbersServer struct {
+	grpc.ServerStream
+}
+
+func (x *numberSumOfNumbersServer) SendAndClose(m *OutputNumber) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *numberSumOfNumbersServer) Recv() (*InputNumber, error) {
+	m := new(InputNumber)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _Number_NumberChat_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(NumberServer).NumberChat(&numberNumberChatServer{stream})
+}
+
+type Number_NumberChatServer interface {
+	Send(*OutputNumber) error
+	Recv() (*InputNumber, error)
+	grpc.ServerStream
+}
+
+type numberNumberChatServer struct {
+	grpc.ServerStream
+}
+
+func (x *numberNumberChatServer) Send(m *OutputNumber) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *numberNumberChatServer) Recv() (*InputNumber, error) {
+	m := new(InputNumber)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 var _Number_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.Number",
 	HandlerType: (*NumberServer)(nil),
@@ -305,6 +434,17 @@ var _Number_serviceDesc = grpc.ServiceDesc{
 			StreamName:    "MultipleOfTwo",
 			Handler:       _Number_MultipleOfTwo_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "SumOfNumbers",
+			Handler:       _Number_SumOfNumbers_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "NumberChat",
+			Handler:       _Number_NumberChat_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "number.proto",

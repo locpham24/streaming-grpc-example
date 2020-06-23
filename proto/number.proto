@@ -5,6 +5,8 @@ package proto;
 service Number {
     rpc HelloNumber(InputNumber) returns (HelloOutput){};
     rpc MultipleOfTwo(InputNumber) returns (stream OutputNumber){};
+    rpc SumOfNumbers(stream InputNumber) returns (OutputNumber){};
+    rpc NumberChat(stream InputNumber) returns (stream OutputNumber){};
 }
 
 message InputNumber {
